@@ -1,0 +1,24 @@
+---
+- name: Test SFTP by copying a file
+  hosts: localhost
+  become: yes
+  tasks:
+    - name: Create a test file
+      copy:
+        content: "This is a test file for Ansible SFTP."
+        dest: "/tmp/test_file.txt"
+    
+    - name: Copy the test file to the SFTP user's home directory
+      command: "sftp sftpuser@localhost:/home/sftpuser/test_file.txt < /tmp/test_file.txt"
+      ignore_errors: yes
+
+      
+    - name: Check if the file exists in the SFTP user's home directory
+      stat:
+        path: "/home/sftp_user/test_file.txt"
+      register: result
+      
+    - name: Display result
+      debug:
+        msg: "The file was successfully copied to the SFTP user's home directory."
+      when: result.stat.exists
